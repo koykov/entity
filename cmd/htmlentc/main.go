@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"go/format"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -67,23 +67,13 @@ func main() {
 
 	_, _ = w.WriteString("var (\n")
 
-	_, _ = w.WriteString("__n2cp = map[string]rune{\n")
-	for i := 0; i < len(names); i++ {
-		_, _ = w.WriteString(`"`)
-		_, _ = w.WriteString(names[i])
-		_, _ = w.WriteString(`":`)
-		_, _ = w.WriteString(fmt.Sprintf("0x%08x", raw[names[i]].Codepoints[0]))
-		_, _ = w.WriteString(",\n")
-	}
-	_, _ = w.WriteString("}\n")
-
 	_, _ = w.WriteString("__n2c = map[string]string{\n")
 	for i := 0; i < len(names); i++ {
 		_, _ = w.WriteString(`"`)
 		_, _ = w.WriteString(names[i])
-		_, _ = w.WriteString(`":`)
-		_, _ = w.WriteString(fmt.Sprintf("0x%08x", raw[names[i]].Codepoints[0]))
-		_, _ = w.WriteString(",\n")
+		_, _ = w.WriteString(`":"`)
+		_, _ = w.WriteString(raw[names[i]].Characters)
+		_, _ = w.WriteString("\",\n")
 	}
 	_, _ = w.WriteString("}\n")
 
@@ -95,8 +85,10 @@ func main() {
 		err       error
 	)
 	if fmtSource, err = format.Source(source); err != nil {
-		return
+		log.Fatalln(err)
 	}
 
-	fmt.Println(string(fmtSource))
+	if err = ioutil.WriteFile("repo.go", fmtSource, 0644); err != nil {
+		log.Fatalln(err)
+	}
 }
