@@ -1,3 +1,3 @@
-package htmlent
+package entity
 
-//go:generate htmlentc --source=https://html.spec.whatwg.org/entities.json
+//go:generate entgen --source=https://html.spec.whatwg.org/entities.json

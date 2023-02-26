@@ -69,7 +69,7 @@ func main() {
 		w.WriteString(os.Args[i])
 	}
 	_, _ = w.WriteString("\". DO NOT EDIT.\n\n")
-	_, _ = w.WriteString("package htmlent\n\n")
+	_, _ = w.WriteString("package entity\n\n")
 
 	_, _ = w.WriteString("import \"github.com/koykov/entry\"\n\n")
 

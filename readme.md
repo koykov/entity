@@ -1,3 +1,3 @@
-# HTML entity
+# Entity
 
-Collection of HTML entities and utils.
+Collection of various entities.
