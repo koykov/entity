@@ -48,20 +48,35 @@ func (m htmlModule) Compile(w moduleWriter, input, target string) (err error) {
 
 	var buf []byte
 
-	_, _ = w.WriteString("import \"github.com/koykov/entry\"\n\n")
 	_, _ = w.WriteString("var (\n")
 
-	_, _ = w.WriteString("__n2c = map[string]entry.Entry32{\n")
+	_, _ = w.WriteString("__bufH = []HTML{\n")
 	for i := 0; i < len(names); i++ {
-		_, _ = w.WriteString(`"`)
-		_, _ = w.WriteString(names[i])
-		_, _ = w.WriteString(`":`)
 		var e entry.Entry32
 		lo := len(buf)
 		buf = append(buf, raw[names[i]].Characters...)
 		hi := len(buf)
 		e.Encode(uint16(lo), uint16(hi))
+
+		_, _ = w.WriteString("HTML{name:")
 		_, _ = w.WriteString(fmt.Sprintf("0x%08x", e))
+		_, _ = w.WriteString(",cp:")
+		var cp int64
+		cp = int64(raw[names[i]].Codepoints[0]) << 32
+		if len(raw[names[i]].Codepoints) > 1 {
+			cp = cp | int64(raw[names[i]].Codepoints[1])
+		}
+		_, _ = w.WriteString(fmt.Sprintf("0x%08x", cp))
+		_, _ = w.WriteString("},\n")
+	}
+	_, _ = w.WriteString("}\n")
+
+	_, _ = w.WriteString("__bufHN = map[string]int{\n")
+	for i := 0; i < len(names); i++ {
+		_, _ = w.WriteString(`"`)
+		_, _ = w.WriteString(names[i])
+		_, _ = w.WriteString(`":`)
+		_, _ = w.WriteString(fmt.Sprintf("0x%04x", i))
 		_, _ = w.WriteString(",\n")
 	}
 	_, _ = w.WriteString("}\n")
