@@ -7,11 +7,6 @@ import (
 	"os"
 )
 
-type entities map[string]struct {
-	Codepoints []int  `json:"codepoints"`
-	Characters string `json:"characters"`
-}
-
 type moduleWriter interface {
 	Write(p []byte) (int, error)
 	WriteString(s string) (int, error)
@@ -22,9 +17,6 @@ type moduleWriter interface {
 
 var (
 	fmod, fin, ftrg string
-
-	raw   entities
-	names []string
 
 	mods = map[string]module{
 		"html": htmlModule{},

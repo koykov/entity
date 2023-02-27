@@ -12,6 +12,16 @@ import (
 	"github.com/koykov/entry"
 )
 
+type entities map[string]struct {
+	Codepoints []int  `json:"codepoints"`
+	Characters string `json:"characters"`
+}
+
+var (
+	raw   entities
+	names []string
+)
+
 type htmlModule struct{}
 
 func (m htmlModule) Validate(input, _ string) error {
