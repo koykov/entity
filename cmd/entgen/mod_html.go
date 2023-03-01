@@ -34,7 +34,7 @@ func (m htmlModule) Validate(input, _ string) error {
 
 func (m htmlModule) Compile(w moduleWriter, input, target string) (err error) {
 	if len(target) == 0 {
-		target = "html_repo.go"
+		target = "html/repo.go"
 	}
 
 	resp, err := http.Get(input)
@@ -62,7 +62,7 @@ func (m htmlModule) Compile(w moduleWriter, input, target string) (err error) {
 	_, _ = w.WriteString("var (\n")
 
 	// Write list of HTML objects.
-	_, _ = w.WriteString("__bufH = []HTML{\n")
+	_, _ = w.WriteString("__bufH = []Entity{\n")
 	for i := 0; i < len(names); i++ {
 		var en, ev entry.Entry32
 		lo := len(buf)
@@ -75,7 +75,7 @@ func (m htmlModule) Compile(w moduleWriter, input, target string) (err error) {
 		hi = len(buf)
 		ev.Encode(uint16(lo), uint16(hi))
 
-		_, _ = w.WriteString("HTML{name:")
+		_, _ = w.WriteString("Entity{name:")
 		_, _ = w.WriteString(fmt.Sprintf("0x%08x", en))
 		_, _ = w.WriteString(",val:")
 		_, _ = w.WriteString(fmt.Sprintf("0x%08x", ev))

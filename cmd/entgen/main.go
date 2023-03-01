@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 )
@@ -65,7 +66,7 @@ func main() {
 		w.WriteString(os.Args[i])
 	}
 	_, _ = w.WriteString("\". DO NOT EDIT.\n\n")
-	_, _ = w.WriteString("package entity\n\n")
+	_, _ = w.WriteString(fmt.Sprintf("package %s\n\n", fmod))
 
 	mod = mods[fmod]
 	log.Printf("%s compilation started\n", fmod)
