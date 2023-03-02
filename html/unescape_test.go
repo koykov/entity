@@ -3,9 +3,9 @@ package html
 import "testing"
 
 var stagesUnesc = []stage{
-	// {"copy", "A\ttext\nstring", "A\ttext\nstring"},
+	{"copy", "A\ttext\nstring", "A\ttext\nstring"},
 	{"simple", "&amp; &gt; &lt;", "& > <"},
-	// {"stringEnd", "&amp &amp", "& &"},
+	{"stringEnd", "&amp &amp", "& &"},
 	// {"multiCodepoint", "text &gesl; blah", "text \u22db\ufe00 blah"},
 	// {"decimalEntity", "Delta = &#916; ", "Delta = Δ "},
 	// {"hexadecimalEntity", "Lambda = &#x3bb; = &#X3Bb ", "Lambda = λ = λ "},
