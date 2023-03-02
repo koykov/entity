@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	"github.com/koykov/byteseq"
+	"github.com/koykov/fastconv"
 )
 
 func Unescape[T byteseq.Byteseq](x T) T {
@@ -24,11 +25,28 @@ func AppendUnescape[T byteseq.Byteseq](dst []byte, x T) []byte {
 	}
 
 	_ = p[l-1]
+	lo, hi := 0, 0
+	var tag bool
 	for i := 0; i < l; i++ {
-		if p[i] == '&' {
-			//
-		} else {
-			dst = append(dst, p[i])
+		switch {
+		case p[i] == '&':
+			tag = true
+			lo = i
+			hi = lo
+		case tag && p[i] == ';':
+			tag = false
+			hi = i + 1
+			t := fastconv.B2S(p[lo:hi])
+			if i1, ok := __bufHN[t]; ok {
+				h := __bufH[i1]
+				dst = append(dst, h.Value()...)
+			} else {
+				dst = append(dst, t...)
+			}
+		default:
+			if !tag {
+				dst = append(dst, p[i])
+			}
 		}
 	}
 
