@@ -1,12 +1,9 @@
 package html
 
 import (
-	"github.com/koykov/bytealg"
-	"github.com/koykov/byteseq"
-)
+	"bytes"
 
-var (
-	esc = []byte("&'<>\"")
+	"github.com/koykov/byteseq"
 )
 
 func Escape[T byteseq.Byteseq](x T) T {
@@ -16,13 +13,18 @@ func Escape[T byteseq.Byteseq](x T) T {
 
 func AppendEscape[T byteseq.Byteseq](dst []byte, x T) []byte {
 	p := byteseq.Q2B(x)
-	off := 0
-	for {
-		i := bytealg.IndexAnyAt(p, esc, off)
-		if i < 0 {
-			break
-		}
-		dst = append(dst, p[off:i]...)
+	l := len(p)
+	if l == 0 {
+		return dst
+	}
+
+	if i := bytes.IndexAny(p, "&'<>\""); i == -1 {
+		dst = append(dst, p...)
+		return dst
+	}
+
+	_ = p[l-1]
+	for i := 0; i < l; i++ {
 		switch p[i] {
 		case '&':
 			dst = append(dst, "&amp;"...)
@@ -34,10 +36,10 @@ func AppendEscape[T byteseq.Byteseq](dst []byte, x T) []byte {
 			dst = append(dst, "&gt;"...)
 		case '"':
 			dst = append(dst, "&#34;"...)
+		default:
+			dst = append(dst, p[i])
 		}
-		off = i + 1
 	}
-	dst = append(dst, p[off:]...)
 
 	return dst
 }

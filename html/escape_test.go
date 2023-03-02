@@ -5,37 +5,16 @@ import (
 	"testing"
 )
 
-type stage struct {
-	key    string
-	raw    string
-	expect string
+var stagesEsc = []stage{
+	{"copy", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.", "Lorem ipsum dolor sit amet, consectetur adipiscing elit."},
+	{"simple", "foo & > < bar", "foo &amp; &gt; &lt; bar"},
+	{"stringEnd", "foobar '", "foobar &#39;"},
+	{
+		"long",
+		strings.Repeat("foo < bar > asd & fgh ' zzz \" ", 100),
+		strings.Repeat("foo &lt; bar &gt; asd &amp; fgh &#39; zzz &#34; ", 100),
+	},
 }
-
-var (
-	stagesEsc = []stage{
-		{"copy", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.", "Lorem ipsum dolor sit amet, consectetur adipiscing elit."},
-		{"simple", "foo & > < bar", "foo &amp; &gt; &lt; bar"},
-		{"stringEnd", "foobar '", "foobar &#39;"},
-		{
-			"multiple",
-			strings.Repeat("foo < bar > asd & fgh ' zzz \" ", 100),
-			strings.Repeat("foo &lt; bar &gt; asd &amp; fgh &#39; zzz &#34; ", 100),
-		},
-	}
-	stagesUnesc = []stage{
-		{"copy", "A\ttext\nstring", "A\ttext\nstring"},
-		{"simple", "&amp; &gt; &lt;", "& > <"},
-		{"stringEnd", "&amp &amp", "& &"},
-		{"multiCodepoint", "text &gesl; blah", "text \u22db\ufe00 blah"},
-		{"decimalEntity", "Delta = &#916; ", "Delta = Δ "},
-		{"hexadecimalEntity", "Lambda = &#x3bb; = &#X3Bb ", "Lambda = λ = λ "},
-		{"numericEnds", "&# &#x &#128;43 &copy = &#169f = &#xa9", "&# &#x €43 © = ©f = ©"},
-		{"numericReplacements", "Footnote&#x87;", "Footnote‡"},
-		{"copySingleAmpersand", "&", "&"},
-		{"copyAmpersandNonEntity", "text &test", "text &test"},
-		{"copyAmpersandHash", "text &#", "text &#"},
-	}
-)
 
 func TestEscape(t *testing.T) {
 	for _, stage := range stagesEsc {
