@@ -29,23 +29,24 @@ func AppendUnescape[T byteseq.Byteseq](dst []byte, x T) []byte {
 	lo, hi := 0, 0
 	var tag bool
 	for i := 0; i < l; i++ {
+		c := p[i]
 		switch {
-		case p[i] == '&':
+		case c == '&':
 			tag = true
 			lo = i
 			hi = lo
-		case tag && p[i] == ';':
+		case tag && c == ';':
 			tag = false
 			hi = i + 1
 			dst = unesc(dst, p[lo:hi])
-		case tag && !unicode.IsLetter(rune(p[i])):
+		case tag && !unicode.IsLetter(rune(c)) && !unicode.IsDigit(rune(c)) && c != '#' && c != 'x' && c != 'X':
 			tag = false
 			hi = i
 			dst = unesc(dst, p[lo:hi])
-			dst = append(dst, p[i])
+			dst = append(dst, c)
 		default:
 			if !tag {
-				dst = append(dst, p[i])
+				dst = append(dst, c)
 			}
 		}
 	}
@@ -57,12 +58,36 @@ func AppendUnescape[T byteseq.Byteseq](dst []byte, x T) []byte {
 }
 
 func unesc(dst, ent []byte) []byte {
-	s := fastconv.B2S(ent)
-	if i1, ok := __bufHN[s]; ok {
-		h := __bufH[i1]
-		dst = append(dst, h.Value()...)
-	} else {
-		dst = append(dst, s...)
+	if len(ent) < 2 {
+		dst = append(dst, ent...)
+		return dst
+	}
+	switch {
+	case ent[1] == '#':
+		// todo implement decimal and hexadecimal parsing
+		// lo, hi := 2, len(ent)
+		// if ent[hi-1] == ';' {
+		// 	hi--
+		// }
+		// base := 10
+		// pent := ent[lo:hi]
+		// if pent[0] == 'x' || pent[1] == 'X' {
+		// 	base = 16
+		// 	pent = pent[1:]
+		// }
+		// i, err := strconv.ParseInt(fastconv.B2S(pent), base, 64)
+		// if err != nil {
+		// 	dst = append(dst, ent...)
+		// 	return dst
+		// }
+	default:
+		s := fastconv.B2S(ent)
+		if i1, ok := __bufHN[s]; ok {
+			h := __bufH[i1]
+			dst = append(dst, h.Value()...)
+		} else {
+			dst = append(dst, s...)
+		}
 	}
 	return dst
 }
