@@ -106,10 +106,12 @@ func (m htmlModule) Compile(w moduleWriter, input, target string) (err error) {
 	_, _ = w.WriteString("__bufHCP = map[int64]int{\n")
 	for i := 0; i < len(names); i++ {
 		var cp int64
-		cp = int64(raw[names[i]].Codepoints[0]) << 32
-		if len(raw[names[i]].Codepoints) > 1 {
-			cp = cp | int64(raw[names[i]].Codepoints[1])
-		}
+		cp = int64(raw[names[i]].Codepoints[0])
+		// todo implement HCP2 registry.
+		// cp = int64(raw[names[i]].Codepoints[0]) << 32
+		// if len(raw[names[i]].Codepoints) > 1 {
+		// 	cp = cp | int64(raw[names[i]].Codepoints[1])
+		// }
 		if _, ok := hcp[cp]; ok {
 			continue
 		}
