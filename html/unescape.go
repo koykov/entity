@@ -2,6 +2,7 @@ package html
 
 import (
 	"bytes"
+	"strconv"
 	"unicode"
 
 	"github.com/koykov/byteseq"
@@ -64,22 +65,27 @@ func unesc(dst, ent []byte) []byte {
 	}
 	switch {
 	case ent[1] == '#':
-		// todo implement decimal and hexadecimal parsing
-		// lo, hi := 2, len(ent)
-		// if ent[hi-1] == ';' {
-		// 	hi--
-		// }
-		// base := 10
-		// pent := ent[lo:hi]
-		// if pent[0] == 'x' || pent[1] == 'X' {
-		// 	base = 16
-		// 	pent = pent[1:]
-		// }
-		// i, err := strconv.ParseInt(fastconv.B2S(pent), base, 64)
-		// if err != nil {
-		// 	dst = append(dst, ent...)
-		// 	return dst
-		// }
+		lo, hi := 2, len(ent)
+		if ent[hi-1] == ';' {
+			hi--
+		}
+		base := 10
+		pent := ent[lo:hi]
+		if pent[0] == 'x' || pent[1] == 'X' {
+			base = 16
+			pent = pent[1:]
+		}
+		i, err := strconv.ParseInt(fastconv.B2S(pent), base, 64)
+		if err != nil {
+			dst = append(dst, ent...)
+			return dst
+		}
+		if i1, ok := __bufHCP[i]; ok {
+			h := __bufH[i1]
+			dst = append(dst, h.Value()...)
+		} else {
+			dst = append(dst, ent...)
+		}
 	default:
 		s := fastconv.B2S(ent)
 		if i1, ok := __bufHN[s]; ok {
