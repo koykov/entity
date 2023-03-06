@@ -71,7 +71,7 @@ func unesc(dst, ent []byte) []byte {
 		}
 		base := 10
 		pent := ent[lo:hi]
-		if pent[0] == 'x' || pent[1] == 'X' {
+		if pent[0] == 'x' || pent[0] == 'X' {
 			base = 16
 			pent = pent[1:]
 		}
