@@ -105,17 +105,37 @@ func (m htmlModule) Compile(w moduleWriter, input, target string) (err error) {
 	var hcp = map[int64]struct{}{}
 	_, _ = w.WriteString("__bufHCP = map[int64]int{\n")
 	for i := 0; i < len(names); i++ {
+		if len(raw[names[i]].Codepoints) > 1 {
+			continue
+		}
 		var cp int64
 		cp = int64(raw[names[i]].Codepoints[0])
-		// todo implement HCP2 registry.
-		// cp = int64(raw[names[i]].Codepoints[0]) << 32
-		// if len(raw[names[i]].Codepoints) > 1 {
-		// 	cp = cp | int64(raw[names[i]].Codepoints[1])
-		// }
 		if _, ok := hcp[cp]; ok {
 			continue
 		}
 		hcp[cp] = struct{}{}
+		_, _ = w.WriteString(fmt.Sprintf("0x%08x", cp))
+		_, _ = w.WriteString(":")
+		_, _ = w.WriteString(fmt.Sprintf("0x%04x", i))
+		_, _ = w.WriteString(",\n")
+	}
+	_, _ = w.WriteString("}\n")
+
+	var hcp2 = map[int64]struct{}{}
+	_, _ = w.WriteString("__bufHCP2 = map[int64]int{\n")
+	for i := 0; i < len(names); i++ {
+		if len(raw[names[i]].Codepoints) != 2 {
+			continue
+		}
+		var cp int64
+		cp = int64(raw[names[i]].Codepoints[0]) << 32
+		if len(raw[names[i]].Codepoints) > 1 {
+			cp = cp | int64(raw[names[i]].Codepoints[1])
+		}
+		if _, ok := hcp2[cp]; ok {
+			continue
+		}
+		hcp2[cp] = struct{}{}
 		_, _ = w.WriteString(fmt.Sprintf("0x%08x", cp))
 		_, _ = w.WriteString(":")
 		_, _ = w.WriteString(fmt.Sprintf("0x%04x", i))

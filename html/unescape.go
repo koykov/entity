@@ -59,7 +59,7 @@ func AppendUnescape[T byteseq.Byteseq](dst []byte, x T) []byte {
 }
 
 func unesc(dst, ent []byte) []byte {
-	if len(ent) < 2 {
+	if len(ent) < 3 {
 		dst = append(dst, ent...)
 		return dst
 	}
@@ -75,6 +75,16 @@ func unesc(dst, ent []byte) []byte {
 			base = 16
 			pent = pent[1:]
 		}
+		var rest []byte
+		if base == 10 {
+			for i := 0; i < len(pent); i++ {
+				if '0' > pent[i] || pent[i] > '9' {
+					rest = pent[i:]
+					pent = pent[:i]
+					break
+				}
+			}
+		}
 		i, err := strconv.ParseInt(fastconv.B2S(pent), base, 64)
 		if err != nil {
 			dst = append(dst, ent...)
@@ -84,8 +94,19 @@ func unesc(dst, ent []byte) []byte {
 			h := __bufH[i1]
 			dst = append(dst, h.Value()...)
 		} else {
-			dst = append(dst, ent...)
+			if 0x80 <= i && i <= 0x9F {
+				i = int64(cp1252[i-0x80])
+			} else if i == 0 || (0xD800 <= i && i <= 0xDFFF) || i > 0x10FFFF {
+				i = '\uFFFD'
+			}
+			if i1, ok := __bufHCP[i]; ok {
+				h := __bufH[i1]
+				dst = append(dst, h.Value()...)
+			} else {
+				dst = append(dst, ent...)
+			}
 		}
+		dst = append(dst, rest...)
 	default:
 		s := fastconv.B2S(ent)
 		if i1, ok := __bufHN[s]; ok {
