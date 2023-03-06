@@ -1,6 +1,8 @@
 package html
 
-import "testing"
+import (
+	"testing"
+)
 
 var stagesUnesc = []stage{
 	{"copy", "A\ttext\nstring", "A\ttext\nstring"},
@@ -23,6 +25,19 @@ func TestUnescape(t *testing.T) {
 			if r != stage.expect {
 				t.FailNow()
 			}
+		})
+	}
+}
+
+func BenchmarkUnescape(b *testing.B) {
+	for _, stage := range stagesUnesc {
+		b.Run(stage.key, func(b *testing.B) {
+			b.ReportAllocs()
+			var buf []byte
+			for i := 0; i < b.N; i++ {
+				buf = AppendUnescape(buf[:0], stage.raw)
+			}
+			_ = buf
 		})
 	}
 }

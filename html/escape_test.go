@@ -27,7 +27,7 @@ func TestEscape(t *testing.T) {
 	}
 }
 
-func BenchmarkUnescape(b *testing.B) {
+func BenchmarkEscape(b *testing.B) {
 	for _, stage := range stagesEsc {
 		b.Run(stage.key, func(b *testing.B) {
 			b.ReportAllocs()
