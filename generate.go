@@ -1,3 +1,3 @@
 package entity
 
-//go:generate entgen --source=https://html.spec.whatwg.org/entities.json
+//go:generate entgen --module=html --input=https://html.spec.whatwg.org/entities.json --target=html/repo.go
