@@ -43,3 +43,51 @@ func AppendEscape[T byteseq.Byteseq](dst []byte, x T) []byte {
 
 	return dst
 }
+
+func WriteEscape[T byteseq.Byteseq](w Writer, x T) (n int, err error) {
+	p := byteseq.Q2B(x)
+	l := len(p)
+	if l == 0 {
+		return
+	}
+
+	if i := bytes.IndexAny(p, "&'<>\""); i == -1 {
+		n, err = w.Write(p)
+		return
+	}
+
+	_ = p[l-1]
+	for i := 0; i < l; i++ {
+		var n1 int
+		switch p[i] {
+		case '&':
+			if n1, err = w.WriteString("&amp;"); err != nil {
+				return
+			}
+		case '\'':
+			if n1, err = w.WriteString("&#39;"); err != nil {
+				return
+			}
+		case '<':
+			if n1, err = w.WriteString("&lt;"); err != nil {
+				return
+			}
+		case '>':
+			if n1, err = w.WriteString("&gt;"); err != nil {
+				return
+			}
+		case '"':
+			if n1, err = w.WriteString("&#34;"); err != nil {
+				return
+			}
+		default:
+			if err = w.WriteByte(p[i]); err != nil {
+				return
+			}
+			n1 = 1
+		}
+		n += n1
+	}
+
+	return
+}

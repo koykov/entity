@@ -11,7 +11,16 @@ type Entity struct {
 	cp   int64
 }
 
+func (e Entity) Name() string {
+	lo, hi := e.name.Decode()
+	return fastconv.B2S(__buf[lo:hi])
+}
+
 func (e Entity) Value() string {
 	lo, hi := e.val.Decode()
 	return fastconv.B2S(__buf[lo:hi])
+}
+
+func (e Entity) Codepoint() int64 {
+	return e.cp
 }

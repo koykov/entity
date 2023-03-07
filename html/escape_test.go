@@ -1,6 +1,7 @@
 package html
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 )
@@ -31,9 +32,13 @@ func BenchmarkEscape(b *testing.B) {
 	for _, stage := range stagesEsc {
 		b.Run(stage.key, func(b *testing.B) {
 			b.ReportAllocs()
-			var buf []byte
+			var buf bytes.Buffer
 			for i := 0; i < b.N; i++ {
-				buf = AppendEscape(buf[:0], stage.raw)
+				buf.Reset()
+				_, _ = WriteEscape(&buf, stage.raw)
+				if buf.String() != stage.expect {
+					b.FailNow()
+				}
 			}
 		})
 	}
