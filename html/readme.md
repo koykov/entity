@@ -19,5 +19,10 @@ e := html.Unescape(x) // "&# &#x €43 © = ©f = ©"
 
 Buffered version:
 ```go
+import bytes
+import "github.com/koykov/entity/html"
 
+var buf bytes.Buffer // take me from the pool and release me after use
+s := "foo & > < bar"
+_, _ := html.WriteEscape(&buf, s) // "&# &#x €43 © = ©f = ©"
 ```
