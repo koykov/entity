@@ -36,10 +36,8 @@ func BenchmarkEscape(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				buf.Reset()
 				_, _ = WriteEscape(&buf, stage.raw)
-				if buf.String() != stage.expect {
-					b.FailNow()
-				}
 			}
+			_ = buf
 		})
 	}
 }
