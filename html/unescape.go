@@ -85,6 +85,10 @@ func unesc(dst, ent []byte) []byte {
 				}
 			}
 		}
+		if len(pent) == 0 {
+			dst = append(dst, ent...)
+			return dst
+		}
 		i, err := strconv.ParseInt(fastconv.B2S(pent), base, 64)
 		if err != nil {
 			dst = append(dst, ent...)
