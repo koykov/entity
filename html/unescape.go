@@ -39,11 +39,11 @@ func AppendUnescape[T byteseq.Byteseq](dst []byte, x T) []byte {
 		case tag && c == ';':
 			tag = false
 			hi = i + 1
-			dst = unesc(dst, p[lo:hi])
+			dst = unescB(dst, p[lo:hi])
 		case tag && !unicode.IsLetter(rune(c)) && !unicode.IsDigit(rune(c)) && c != '#' && c != 'x' && c != 'X':
 			tag = false
 			hi = i
-			dst = unesc(dst, p[lo:hi])
+			dst = unescB(dst, p[lo:hi])
 			dst = append(dst, c)
 		default:
 			if !tag {
@@ -52,13 +52,13 @@ func AppendUnescape[T byteseq.Byteseq](dst []byte, x T) []byte {
 		}
 	}
 	if tag {
-		dst = unesc(dst, p[lo:l])
+		dst = unescB(dst, p[lo:l])
 	}
 
 	return dst
 }
 
-func unesc(dst, ent []byte) []byte {
+func unescB(dst, ent []byte) []byte {
 	if len(ent) < 3 {
 		dst = append(dst, ent...)
 		return dst
@@ -148,14 +148,14 @@ func WriteUnescape[T byteseq.Byteseq](w Writer, x T) (n int, err error) {
 		case tag && c == ';':
 			tag = false
 			hi = i + 1
-			if n1, err = unesc1(w, p[lo:hi]); err != nil {
+			if n1, err = unescW(w, p[lo:hi]); err != nil {
 				return
 			}
 			n += n1
 		case tag && !unicode.IsLetter(rune(c)) && !unicode.IsDigit(rune(c)) && c != '#' && c != 'x' && c != 'X':
 			tag = false
 			hi = i
-			if n1, err = unesc1(w, p[lo:hi]); err != nil {
+			if n1, err = unescW(w, p[lo:hi]); err != nil {
 				return
 			}
 			n += n1
@@ -173,7 +173,7 @@ func WriteUnescape[T byteseq.Byteseq](w Writer, x T) (n int, err error) {
 		}
 	}
 	if tag {
-		if n1, err = unesc1(w, p[lo:l]); err != nil {
+		if n1, err = unescW(w, p[lo:l]); err != nil {
 			return
 		}
 		n += n1
@@ -182,7 +182,7 @@ func WriteUnescape[T byteseq.Byteseq](w Writer, x T) (n int, err error) {
 	return
 }
 
-func unesc1(w Writer, ent []byte) (n int, err error) {
+func unescW(w Writer, ent []byte) (n int, err error) {
 	var n1 int
 	if len(ent) < 3 {
 		if n1, err = w.Write(ent); err != nil {
