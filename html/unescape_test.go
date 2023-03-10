@@ -1,6 +1,7 @@
 package html
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -33,9 +34,10 @@ func BenchmarkUnescape(b *testing.B) {
 	for _, stage := range stagesUnesc {
 		b.Run(stage.key, func(b *testing.B) {
 			b.ReportAllocs()
-			var buf []byte
+			var buf bytes.Buffer
 			for i := 0; i < b.N; i++ {
-				buf = AppendUnescape(buf[:0], stage.raw)
+				buf.Reset()
+				_, _ = WriteUnescape(&buf, stage.raw)
 			}
 			_ = buf
 		})
