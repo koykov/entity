@@ -9,6 +9,10 @@ import (
 	"github.com/koykov/fastconv"
 )
 
+func UnescapeRune[T byteseq.Byteseq](x T) []rune {
+	return AppendUnescapeRune(nil, x)
+}
+
 func AppendUnescapeRune[T byteseq.Byteseq](dst []rune, x T) []rune {
 	s := byteseq.Q2S(x)
 	l := len(s)
@@ -36,7 +40,7 @@ func AppendUnescapeRune[T byteseq.Byteseq](dst []rune, x T) []rune {
 		case tag && !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '#' && r != 'x' && r != 'X':
 			tag = false
 			hi = i
-			dst = fastconv.AppendS2R(dst, s[lo:hi])
+			dst = unescR(dst, s[lo:hi])
 			dst = append(dst, r)
 		default:
 			if !tag {
