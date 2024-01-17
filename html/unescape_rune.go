@@ -5,8 +5,8 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/koykov/byteconv"
 	"github.com/koykov/byteseq"
-	"github.com/koykov/fastconv"
 )
 
 func UnescapeRune[T byteseq.Byteseq](x T) []rune {
@@ -21,7 +21,7 @@ func AppendUnescapeRune[T byteseq.Byteseq](dst []rune, x T) []rune {
 	}
 
 	if i := strings.Index(s, "&"); i == -1 {
-		dst = fastconv.AppendS2R(dst, s)
+		dst = byteconv.AppendS2R(dst, s)
 		return dst
 	}
 
@@ -57,7 +57,7 @@ func AppendUnescapeRune[T byteseq.Byteseq](dst []rune, x T) []rune {
 
 func unescR(dst []rune, ent string) []rune {
 	if len(ent) < 3 {
-		dst = fastconv.AppendS2R(dst, ent)
+		dst = byteconv.AppendS2R(dst, ent)
 		return dst
 	}
 	switch {
@@ -83,17 +83,17 @@ func unescR(dst []rune, ent string) []rune {
 			}
 		}
 		if len(pent) == 0 {
-			dst = fastconv.AppendS2R(dst, ent)
+			dst = byteconv.AppendS2R(dst, ent)
 			return dst
 		}
 		i, err := strconv.ParseInt(pent, base, 64)
 		if err != nil {
-			dst = fastconv.AppendS2R(dst, ent)
+			dst = byteconv.AppendS2R(dst, ent)
 			return dst
 		}
 		if i1, ok := __bufHCP[i]; ok {
 			h := __bufH[i1]
-			dst = fastconv.AppendS2R(dst, h.Value())
+			dst = byteconv.AppendS2R(dst, h.Value())
 		} else {
 			if 0x80 <= i && i <= 0x9F {
 				i = int64(cp1252[i-0x80])
@@ -102,18 +102,18 @@ func unescR(dst []rune, ent string) []rune {
 			}
 			if i1, ok := __bufHCP[i]; ok {
 				h := __bufH[i1]
-				dst = fastconv.AppendS2R(dst, h.Value())
+				dst = byteconv.AppendS2R(dst, h.Value())
 			} else {
-				dst = fastconv.AppendS2R(dst, ent)
+				dst = byteconv.AppendS2R(dst, ent)
 			}
 		}
-		dst = fastconv.AppendS2R(dst, rest)
+		dst = byteconv.AppendS2R(dst, rest)
 	default:
 		if i1, ok := __bufHN[ent]; ok {
 			h := __bufH[i1]
-			dst = fastconv.AppendS2R(dst, h.Value())
+			dst = byteconv.AppendS2R(dst, h.Value())
 		} else {
-			dst = fastconv.AppendS2R(dst, ent)
+			dst = byteconv.AppendS2R(dst, ent)
 		}
 	}
 	return dst

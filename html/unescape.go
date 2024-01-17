@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"unicode"
 
+	"github.com/koykov/byteconv"
 	"github.com/koykov/byteseq"
-	"github.com/koykov/fastconv"
 )
 
 func Unescape[T byteseq.Byteseq](x T) T {
@@ -89,7 +89,7 @@ func unescB(dst, ent []byte) []byte {
 			dst = append(dst, ent...)
 			return dst
 		}
-		i, err := strconv.ParseInt(fastconv.B2S(pent), base, 64)
+		i, err := strconv.ParseInt(byteconv.B2S(pent), base, 64)
 		if err != nil {
 			dst = append(dst, ent...)
 			return dst
@@ -112,7 +112,7 @@ func unescB(dst, ent []byte) []byte {
 		}
 		dst = append(dst, rest...)
 	default:
-		s := fastconv.B2S(ent)
+		s := byteconv.B2S(ent)
 		if i1, ok := __bufHN[s]; ok {
 			h := __bufH[i1]
 			dst = append(dst, h.Value()...)
@@ -220,7 +220,7 @@ func unescW(w Writer, ent []byte) (n int, err error) {
 			n += n1
 			return
 		}
-		i, err1 := strconv.ParseInt(fastconv.B2S(pent), base, 64)
+		i, err1 := strconv.ParseInt(byteconv.B2S(pent), base, 64)
 		if err1 != nil {
 			if n1, err = w.Write(ent); err != nil {
 				return
@@ -258,7 +258,7 @@ func unescW(w Writer, ent []byte) (n int, err error) {
 		}
 		n += n1
 	default:
-		s := fastconv.B2S(ent)
+		s := byteconv.B2S(ent)
 		if i1, ok := __bufHN[s]; ok {
 			h := __bufH[i1]
 			if n1, err = w.WriteString(h.Value()); err != nil {
